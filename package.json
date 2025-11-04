@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "backend:dev": "cd apps/backend && gradlew.bat bootRun",
-    "backend:build": "cd apps/backend && gradlew.bat bootJar"
+    "backend:build": "cd apps/backend && gradlew.bat bootJar",
+    "frontend:dev": "turbo run dev:frontend --filter=frontend",
+    "frontend:build": "turbo run build:frontend --filter=frontend"
   },
   "keywords": [],
   "author": "",

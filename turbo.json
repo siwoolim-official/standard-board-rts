@@ -1,6 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/turbo.json",
-  "pipeline": {
+  // 'pipeline'을 'tasks'로 변경합니다.
+  "tasks": { 
     "build": {
       "outputs": ["dist/**", "build/**"],
       "dependsOn": ["^build"]
@@ -9,6 +10,15 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    // 이전 단계에서 추가한 프론트엔드 작업도 'tasks' 아래에 유지됩니다.
+    "dev:frontend": {
+      "cache": false,
+      "persistent": true
+    },
+    "build:frontend": {
+      "outputs": ["dist/**"],
+      "dependsOn": ["^build"]
     }
   }
 }
