@@ -1,5 +1,5 @@
 {
-  "\$schema": "https://json.schemastore.org/turbo.json",
+  "$schema": "https://json.schemastore.org/turbo.json",
   "pipeline": {
     "build": {
       "outputs": ["dist/**", "build/**"],
