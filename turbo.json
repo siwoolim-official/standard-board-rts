@@ -1,0 +1,14 @@
+{
+  "\$schema": "https://json.schemastore.org/turbo.json",
+  "pipeline": {
+    "build": {
+      "outputs": ["dist/**", "build/**"],
+      "dependsOn": ["^build"]
+    },
+    "lint": {},
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

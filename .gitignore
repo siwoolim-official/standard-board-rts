@@ -1,0 +1,16 @@
+# Node
+/node_modules
+/.pnpm-store
+/pnpm-lock.yaml
+
+# Build Artifacts
+/dist
+/build
+/target
+
+# IDE files
+.idea/
+.vscode/
+
+# Environment Variables
+.env
