@@ -58,6 +58,8 @@ public class JwtTokenProvider {
     }
     /**
      * JWT에서 클레임(Claims)을 추출하며, 서명 검증 및 유효성 검사를 수행
+     * @param token JWT 문자열
+     * @return 토큰에 포함된 클레임 객체
      */
     public Claims getClaimsFromToken(String token) {
         return Jwts.parser()
@@ -66,4 +68,29 @@ public class JwtTokenProvider {
                 .parseSignedClaims(token)
                 .getPayload();
     }
+
+
+    /**
+     * JWT의 유효성을 검증합니다.
+     * @param token JWT 문자열
+     * @return 유효하면 true, 아니면 false
+     */
+    public boolean validateToken(String token) {
+        try {
+            getClaimsFromToken(token);
+            return true;
+        } catch (SignatureException ex) {
+            log.error("Invalid JWT signature"); // 서명 불일치 (위변조)
+        } catch (MalformedJwtException ex) {
+            log.error("Invalid JWT token"); // JWT 형식 오류
+        } catch (ExpiredJwtException ex) {
+            log.error("Expired JWT token"); // 토큰 만료
+        } catch (UnsupportedJwtException ex) {
+            log.error("Unsupported JWT token"); // 지원하지 않는 형식의 토큰
+        } catch (IllegalArgumentException ex) {
+            log.error("JWT claims string is empty."); // 클레임 문자열이 비어있음
+        }
+        return false;
+    }
+
 }
