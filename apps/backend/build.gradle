@@ -42,6 +42,13 @@ dependencies {
     // API Documentation (Swagger/OpenAPI)
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13' // SpringDoc (Swagger UI 포함)
 
+    // JWT API (핵심 인터페이스)
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+    // JWT 구현체 (토큰 생성 및 서명에 필요)
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+    // JWT JSON 파서 (Claims 추출 등에 필요)
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+
     // Development & Tools
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'

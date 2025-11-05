@@ -1,7 +1,9 @@
 package com.standardboard.backend.service.auth;
 
+import com.standardboard.backend.auth.jwt.JwtTokenProvider;
 import com.standardboard.backend.domain.user.Role;
 import com.standardboard.backend.domain.user.User;
+import com.standardboard.backend.dto.auth.LoginRequest;
 import com.standardboard.backend.dto.auth.SignUpRequest;
 import com.standardboard.backend.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +29,7 @@ public class AuthService {
      * @param request 회원가입 요청 DTO
      * @return 저장된 User 엔티티
      */
-    @Transactional // 쓰기 작업이므로 트랜잭션 재정의
+    @Transactional
     public User signUp(SignUpRequest request) {
         // 1. 이메일 중복 확인
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -55,6 +57,22 @@ public class AuthService {
     }
 
     /**
-     * (추후 구현 예정): 로그인 및 JWT 토큰 발행 메서드
+     * 로그인 요청을 처리하고 JWT Access Token을 발행합니다.
+     * @param request 로그인 요청 DTO
+     * @return 발행된 JWT Access Token 문자열
      */
+    @Transactional(readOnly = true)
+    public User login(LoginRequest request) {
+        // 1. 이메일로 사용자 조회
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("이메일 또는 비밀번호가 일치하지 않습니다."));
+
+        // 2. 비밀번호 일치 여부 확인
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            // 보안을 위해 이메일과 동일한 메시지 사용 (어떤 정보가 틀렸는지 알려주지 않음)
+            throw new IllegalArgumentException("이메일 또는 비밀번호가 일치하지 않습니다.");
+        }
+
+        return user;
+    }
 }
