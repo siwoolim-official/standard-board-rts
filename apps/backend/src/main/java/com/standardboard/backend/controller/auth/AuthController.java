@@ -64,9 +64,8 @@ public class AuthController {
 
         // 2. JWT Access Token 생성 (TokenProvider 사용)
         String accessToken = jwtTokenProvider.generateToken(
-                authenticatedUser.getId(),
                 authenticatedUser.getEmail(),
-                authenticatedUser.getRole().name()
+                authenticatedUser.getRole()
         );
 
         // 3. 응답 DTO 구성
