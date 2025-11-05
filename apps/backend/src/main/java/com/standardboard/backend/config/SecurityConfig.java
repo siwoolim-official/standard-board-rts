@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -77,6 +78,8 @@ public class SecurityConfig {
         http.authorizeHttpRequests(authz -> authz
                 // Health Check API는 인증 없이 접근을 허용합니다.
                 .requestMatchers("/api/v1/health").permitAll()
+                // H2 Console 경로도 인증 없이 접근을 허용합니다.
+                .requestMatchers("/h2-console/**").permitAll()
                 // 회원가입, 로그인 등 인증 관련 API도 인증 없이 접근을 허용합니다. (추후 구현 예정)
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 // 그 외 모든 /api/** 요청은 인증(로그인)이 필요합니다.
@@ -84,6 +87,14 @@ public class SecurityConfig {
                 // 나머지 모든 요청(정적 리소스 등)은 허용합니다.
                 .anyRequest().permitAll()
         );
+
+        // H2 Console 접속을 위한 X-Frame-Options 헤더 방어 비활성화
+        // H2 Console은 iframe으로 로드되므로, Spring Security가 기본으로 적용하는
+        // X-Frame-Options: DENY 정책을 비활성화해야 화면이 정상적으로 표시됩니다.
+        http.headers(headers -> headers
+                .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
+        );
+
 
         // 5. 기본 인증 비활성화: 폼 로그인, HTTP Basic 인증은 사용하지 않으므로 비활성화합니다.
         http.formLogin(AbstractHttpConfigurer::disable);
