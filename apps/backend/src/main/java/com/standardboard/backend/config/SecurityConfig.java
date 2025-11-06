@@ -1,5 +1,7 @@
 package com.standardboard.backend.config;
 
+import com.standardboard.backend.auth.jwt.JwtTokenProvider;
+import com.standardboard.backend.service.auth.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -9,10 +11,12 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import com.standardboard.backend.auth.jwt.JwtAuthenticationFilter;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,6 +31,16 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    // JWT 컴포넌트들을 의존성 주입받도록 필드 추가
+    private final JwtTokenProvider jwtTokenProvider;
+    private final CustomUserDetailsService userDetailsService;
+
+    // Lombok의 @RequiredArgsConstructor 대신 수동 생성자 주입
+    public SecurityConfig(JwtTokenProvider jwtTokenProvider, CustomUserDetailsService userDetailsService) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.userDetailsService = userDetailsService;
+    }
 
     /**
      * 비밀번호 암호화(해싱)를 위한 Encoder Bean을 등록합니다.
@@ -95,8 +109,13 @@ public class SecurityConfig {
                 .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
         );
 
+        // JWT 인증 필터 등록
+        http.addFilterBefore(
+                new JwtAuthenticationFilter(jwtTokenProvider, userDetailsService), // 생성한 JWT 필터 객체 생성
+                UsernamePasswordAuthenticationFilter.class // 스프링 기본 인증 필터 이전에 실행
+        );
 
-        // 5. 기본 인증 비활성화: 폼 로그인, HTTP Basic 인증은 사용하지 않으므로 비활성화합니다.
+        // 기본 인증 비활성화: 폼 로그인, HTTP Basic 인증은 사용하지 않으므로 비활성화합니다.
         http.formLogin(AbstractHttpConfigurer::disable);
         http.httpBasic(AbstractHttpConfigurer::disable);
 

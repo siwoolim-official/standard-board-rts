@@ -13,8 +13,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * User Entity (사용자 도메인 모델)
@@ -26,7 +31,7 @@ import java.time.LocalDateTime;
 @Table(name = "users") // SQL 예약어와 충돌 방지를 위해 'users' 테이블명 사용
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA 사용 시 기본 생성자 필수, PROTECTED로 외부 접근 제한
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -63,6 +68,23 @@ public class User {
         // Role이 명시되지 않으면 기본값으로 USER를 설정 (방어적 프로그래밍)
         this.role = (role != null) ? role : Role.USER;
     }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        // DB에 저장된 Role enum을 Spring Security의 GrantedAuthority 객체로 변환하여 반환
+            return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+    }
+
+    @Override
+    public String getUsername() {
+        // Spring Security에서 username 역할을 email로 사용합니다.
+        return email;
+    }
+
+    @Override public boolean isAccountNonExpired() { return true; }
+    @Override public boolean isAccountNonLocked() { return true; }
+    @Override public boolean isCredentialsNonExpired() { return true; }
+    @Override public boolean isEnabled() { return true; }
 
     /**
      * DTO에서 엔티티로 변환할 때 비밀번호를 암호화하는 별도 메서드입니다.
