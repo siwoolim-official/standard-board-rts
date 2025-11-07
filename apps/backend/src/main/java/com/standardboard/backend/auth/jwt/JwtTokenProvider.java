@@ -30,7 +30,7 @@ public class JwtTokenProvider {
      * 1. 생성자 주입(@Value): 설정 파일(application.properties)에서 JWT 키와 만료 시간을 주입받아 사용
      * 2. 즉시 초기화: 주입받은 Base64 문자열을 생성자 내에서 즉시 SecretKey 객체로 변환하여 final 필드를 초기화
      */
-    public JwtTokenProvider(@Value("${app.jwt.secret}") String secretKeyString,
+    public JwtTokenProvider(@Value("${app.jwt.secret-key}") String secretKeyString,
                             @Value("${app.jwt.expiration-in-ms}") long expirationTime) {
 
         // Base64 문자열을 디코딩하여 HMAC-SHA 알고리즘에 사용할 SecretKey 객체로 변환
