@@ -7,10 +7,9 @@ import io.jsonwebtoken.security.Keys;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import io.jsonwebtoken.security.SignatureException;
 
 import javax.crypto.SecretKey;
-import java.security.Key;
-import java.security.Security;
 import java.util.Date;
 
 /**
@@ -63,7 +62,7 @@ public class JwtTokenProvider {
      */
     public Claims getClaimsFromToken(String token) {
         return Jwts.parser()
-                .decryptWith(secretKey)
+                .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();

@@ -1,17 +1,17 @@
 import { Routes, Route, Link } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
-import AuthPage from "./pages/AuthPage"; // ⬅️ import 추가
+import AuthPage from "./pages/AuthPage";
 import "./App.css";
 import { Button } from "./components/ui/button";
 import { useThemeStore } from "./store/useThemeStore";
-import { useAuthStore } from "./store/useAuthStore"; // ⬅️ import 추가
+import { useAuthStore } from "./store/useAuthStore";
 
 function App() {
   const theme = useThemeStore((state) => state.theme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
 
-  // ⬇️ 인증 상태와 액션 가져오기
+  // 인증 상태와 액션 가져오기
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
@@ -21,7 +21,7 @@ function App() {
   return (
     <div className={rootClass}>
       <div className="min-h-screen bg-background text-foreground p-4 transition-colors duration-300">
-        {/* 네비게이션 및 테마 버튼 (수정) */}
+        {/* 네비게이션 및 테마 버튼 */}
         <nav className="mb-8 p-4 bg-card shadow rounded-lg flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <Link
@@ -30,12 +30,12 @@ function App() {
             >
               게시판 홈
             </Link>
-            <Link
+            {/* <Link
               to="/about"
               className="text-primary hover:text-primary-foreground font-semibold"
             >
               소개
-            </Link>
+            </Link> */}
 
             {/* 로그인 상태에 따라 환영 메시지 표시 */}
             {isAuthenticated && (
