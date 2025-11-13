@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 인증(Authentication) API Controller
@@ -58,28 +60,36 @@ public class AuthController {
      * @return 성공 시 200 OK와 JWT 토큰 및 사용자 정보를 담은 ApiResponse 반환
      */
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
-        // 1. 서비스 로직 호출: 인증만 수행, User 엔티티 반환
+    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
+        // 서비스 로직 호출: 인증만 수행, User 엔티티 반환
         User authenticatedUser = authService.login(request);
 
-        // 2. JWT Access Token 생성 (TokenProvider 사용)
+        // JWT Access Token 생성 (TokenProvider 사용)
         String accessToken = jwtTokenProvider.generateToken(
                 authenticatedUser.getEmail(),
                 authenticatedUser.getRole()
         );
 
-        // 3. 응답 DTO 구성
-        LoginResponse response = LoginResponse.builder()
-                .accessToken(accessToken)
+        // JWT를 응답 쿠키에 설정 (핵심 변경 사항)
+        Cookie cookie = new Cookie("accessToken", accessToken); // 쿠키 이름
+        cookie.setHttpOnly(true); // JavaScript 접근 차단 (XSS 방어)
+//        cookie.setSecure(false);   // true HTTPS 통신에서만 전송, 운영 환경에서는 true 설정
+        cookie.setPath("/");      // 모든 경로에서 쿠키 전송
+        cookie.setMaxAge(3600);   // 쿠키 만료 시간
+
+        response.addCookie(cookie); // 응답에 쿠키 추가
+
+        // 응답 DTO 구성 (토큰 없이 사용자 정보만 담아 전송)
+        LoginResponse responseBody = LoginResponse.builder()
                 .userId(authenticatedUser.getId())
                 .email(authenticatedUser.getEmail())
                 .nickname(authenticatedUser.getNickname())
                 .role(authenticatedUser.getRole())
                 .build();
 
-        // 4. HTTP 상태 코드 200 OK와 함께 응답
+        // HTTP 상태 코드 200 OK와 함께 응답
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ApiResponse.success(response));
+                .body(ApiResponse.success(responseBody));
     }
 }

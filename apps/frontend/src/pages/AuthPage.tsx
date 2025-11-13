@@ -49,7 +49,7 @@ const AuthPage = () => {
         {
           onSuccess: (data) => {
             // 1. Zustand에 토큰 및 사용자 정보 저장
-            loginAction(data.accessToken, {
+            loginAction({
               userId: data.userId,
               email: data.email,
               nickname: data.nickname,

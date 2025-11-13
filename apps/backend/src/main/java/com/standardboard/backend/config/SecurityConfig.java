@@ -17,7 +17,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import com.standardboard.backend.auth.jwt.JwtAuthenticationFilter;
-
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.ContentTypeOptionsConfig;
 import java.util.Arrays;
 import java.util.List;
 
@@ -102,11 +103,11 @@ public class SecurityConfig {
                 .anyRequest().permitAll()
         );
 
-        // H2 Console 접속을 위한 X-Frame-Options 헤더 방어 비활성화
-        // H2 Console은 iframe으로 로드되므로, Spring Security가 기본으로 적용하는
-        // X-Frame-Options: DENY 정책을 비활성화해야 화면이 정상적으로 표시됩니다.
         http.headers(headers -> headers
-                .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
+                // H2 Console을 위한 클릭재킹 방어 비활성화
+                .frameOptions(FrameOptionsConfig::disable)
+                // Content-Type 옵션 활성화 (보안 강화)
+                .contentTypeOptions(ContentTypeOptionsConfig::disable)
         );
 
         // JWT 인증 필터 등록
