@@ -49,6 +49,7 @@ async function postApi<T>(endpoint: string, data: object): Promise<T> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
+    credentials: "include",
   });
 
   // 백엔드의 ApiResponse 구조를 파싱
